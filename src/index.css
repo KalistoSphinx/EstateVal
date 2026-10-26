@@ -1,0 +1,324 @@
+@import "tailwindcss";
+
+/*
+  EstateVal design tokens
+  Paper / Ink / Graphite / Sage / Indigo / Marigold
+  Type: Newsreader (display) + DM Sans (interface)
+*/
+
+@theme {
+  --font-sans: "DM Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader", Georgia, "Times New Roman", serif;
+
+  --color-paper: #f6f1e7;
+  --color-bone: #fbf8f2;
+  --color-ink: #211f1a;
+  --color-graphite: #625c52;
+  --color-muted: #746d62;
+  --color-line: #ded7ca;
+  --color-line-soft: #ebe4d8;
+
+  --color-sage: #5b7f5f;
+  --color-sage-deep: #496d4e;
+  --color-indigo: #56658f;
+  --color-iris: #87759f;
+  --color-marigold: #d9a13b;
+  --color-rose: #c98993;
+
+  --text-micro: 0.75rem;
+  --text-micro--line-height: 1.45;
+  --text-label: 0.8125rem;
+  --text-label--line-height: 1.45;
+  --text-small: 0.9375rem;
+  --text-small--line-height: 1.55;
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.6;
+  --text-lede: 1.1875rem;
+  --text-lede--line-height: 1.6;
+  --text-title: 1.75rem;
+  --text-title--line-height: 1.2;
+  --text-heading: 2rem;
+  --text-heading--line-height: 1.15;
+}
+
+@layer base {
+  html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    overflow-x: clip;
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1.0625rem;
+    line-height: 1.6;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 500;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+
+  ::selection {
+    background-color: var(--color-ink);
+    color: var(--color-paper);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-indigo);
+    outline-offset: 3px;
+  }
+}
+
+@layer components {
+  .hero-title {
+    font-family: var(--font-display);
+    font-size: clamp(3rem, 6.2vw, 5rem);
+    font-weight: 500;
+    line-height: 0.98;
+    letter-spacing: -0.028em;
+    text-wrap: balance;
+  }
+
+  .page-title {
+    font-family: var(--font-display);
+    font-size: clamp(2.375rem, 4.2vw, 3.25rem);
+    font-weight: 500;
+    line-height: 1.06;
+    letter-spacing: -0.022em;
+    text-wrap: balance;
+  }
+
+  .price-display {
+    font-family: var(--font-display);
+    font-size: clamp(2.9rem, 4.6vw, 3.9rem);
+    font-weight: 500;
+    line-height: 0.95;
+    letter-spacing: -0.025em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .studio-window {
+    position: relative;
+    border: 1px solid var(--color-line);
+    border-radius: 1.25rem;
+    background-color: var(--color-bone);
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.8) inset,
+      0 36px 70px -52px rgba(33, 31, 26, 0.55);
+  }
+
+  .nav-tab {
+    position: relative;
+    padding: 0.625rem 0.75rem;
+    border-radius: 0.5rem;
+    color: var(--color-graphite);
+    font-size: var(--text-small);
+    transition: color 160ms ease;
+  }
+
+  .nav-tab:hover {
+    color: var(--color-ink);
+  }
+
+  .nav-tab[aria-current="page"] {
+    color: var(--color-ink);
+  }
+
+  .nav-tab::after {
+    content: "";
+    position: absolute;
+    right: 0.75rem;
+    bottom: 0.15rem;
+    left: 0.75rem;
+    height: 2px;
+    border-radius: 999px;
+    background-color: #a3701c;
+    opacity: 0;
+    transition: opacity 160ms ease;
+  }
+
+  .nav-tab[aria-current="page"]::after {
+    opacity: 1;
+  }
+
+  .reveal {
+    animation: rise-in 700ms cubic-bezier(0.22, 0.68, 0.16, 1) both;
+  }
+
+  .reveal-late {
+    animation-delay: 120ms;
+  }
+
+  .value-refresh {
+    animation: value-refresh 320ms ease-out both;
+  }
+
+  .skip-link {
+    position: fixed;
+    top: -5rem;
+    left: 1rem;
+    z-index: 100;
+    border-radius: 999px;
+    background-color: var(--color-ink);
+    padding: 0.7rem 1.1rem;
+    color: var(--color-paper);
+    font-size: var(--text-small);
+    transition: top 140ms ease;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+  }
+
+  .tier-matrix {
+    display: grid;
+    grid-template-columns: 76px repeat(var(--tier-count, 4), minmax(0, 1fr));
+    gap: 0.4rem;
+  }
+
+  .tier-cell {
+    padding: 0.7rem 0.15rem;
+  }
+
+  @media (max-width: 639px) {
+    .nav-tab {
+      padding-right: 0.5rem;
+      padding-left: 0.5rem;
+    }
+
+    .nav-tab::after {
+      right: 0.5rem;
+      left: 0.5rem;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .tier-matrix {
+      grid-template-columns: 118px repeat(var(--tier-count, 4), minmax(0, 1fr));
+      gap: 0.5rem;
+    }
+
+    .tier-cell {
+      padding: 1rem 0.25rem;
+    }
+  }
+}
+
+/* Range sliders */
+input[type="range"] {
+  width: 100%;
+  height: 1.5rem;
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 3px;
+  border-radius: 999px;
+  background-color: var(--color-line);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -7.5px;
+  appearance: none;
+  border: 3px solid var(--color-bone);
+  border-radius: 50%;
+  background-color: var(--color-ink);
+  box-shadow: 0 0 0 1px var(--color-ink);
+  transition: transform 140ms ease;
+}
+
+input[type="range"]:hover::-webkit-slider-thumb,
+input[type="range"]:focus-visible::-webkit-slider-thumb {
+  transform: scale(1.12);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 3px;
+  border-radius: 999px;
+  background-color: var(--color-line);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border: 3px solid var(--color-bone);
+  border-radius: 50%;
+  background-color: var(--color-ink);
+  box-shadow: 0 0 0 1px var(--color-ink);
+}
+
+/* Quiet scrollbars */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  border: 3px solid var(--color-paper);
+  border-radius: 999px;
+  background: #d8d1c4;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #bdb5a7;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes value-refresh {
+  from {
+    opacity: 0.35;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
