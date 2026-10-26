@@ -8,7 +8,7 @@ import DiagnosticCharts from './components/DiagnosticCharts';
 import DatasetExplorer from './components/DatasetExplorer';
 import Bloom from './components/Bloom';
 
-const API = 'http://127.0.0.1:8000';
+const API = (import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000').replace(/\/$/, '');
 
 const DEFAULT_FEATURES = {
   City: 'Bangalore', Locality_Tier: 'Mid', BHK: 2, Bathrooms: 2,
@@ -44,7 +44,7 @@ export default function App() {
 
         predict(DEFAULT_FEATURES);
       } catch {
-        setError('Could not reach the FastAPI server at port 8000.');
+        setError(`Could not reach the FastAPI server at ${API}.`);
       }
     })();
   }, []);
@@ -60,9 +60,11 @@ export default function App() {
       if (res.ok) {
         setPredictions(await res.json());
         setError(null);
+      } else {
+        setError(`Prediction failed (${res.status}: ${res.statusText}).`);
       }
     } catch {
-      setError('Prediction request failed. Check that the API is running on port 8000.');
+      setError(`Prediction request failed. Ensure the API is reachable at ${API}.`);
     } finally {
       setPredicting(false);
     }
