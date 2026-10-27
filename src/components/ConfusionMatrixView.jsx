@@ -3,6 +3,7 @@ import PageHeader from './PageHeader';
 
 const MODELS = [
   { key: 'random_forest', label: 'Random forest', short: 'Forest' },
+  { key: 'decision_tree', label: 'Decision tree', short: 'Tree' },
   { key: 'linear_regression', label: 'Ridge regression', short: 'Ridge' },
   { key: 'knn', label: 'Nearest neighbours', short: 'KNN' },
 ];

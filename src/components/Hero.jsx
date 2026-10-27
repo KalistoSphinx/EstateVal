@@ -28,7 +28,7 @@ export default function Hero({ onEstimate, onCompare }) {
           </h1>
 
           <p className="mx-auto mt-7 max-w-[640px] text-lede text-graphite sm:mt-8">
-            Three models value the same home independently: a random forest, a ridge
+            Four models value the same home independently: a random forest, a decision tree, a ridge
             regression, and a nearest-neighbour search. Change one detail and watch each
             respond.
           </p>

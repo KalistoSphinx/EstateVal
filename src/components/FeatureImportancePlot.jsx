@@ -94,28 +94,43 @@ const FEATURE_METADATA = {
 };
 
 export default function FeatureImportancePlot({ importances }) {
-  const [model, setModel] = useState('random_forest'); // 'random_forest' | 'knn' | 'linear_regression'
+  const [model, setModel] = useState('random_forest'); // 'random_forest' | 'decision_tree' | 'knn' | 'linear_regression'
   const [hovered, setHovered] = useState(null);
 
   if (!importances) return null;
 
   const rawRf = importances.random_forest || [];
+  const rawDt = importances.decision_tree || [];
   const rawKnn = importances.knn || [];
   const rawLr = importances.linear_regression || [];
 
   // Prepare normalized horizontal column data sorted from #1 (most important) to #12
   let items = [];
   let maxScale = 60;
-  let metricLabel = 'Decision tree impurity reduction %';
+  let metricLabel = 'Ensemble tree impurity reduction %';
   let modelColor = '#5b7f5f'; // Sage for RF
   let topColor = '#426146';
 
   if (model === 'random_forest') {
     maxScale = 60;
-    metricLabel = 'Decision tree impurity reduction %';
+    metricLabel = 'Ensemble tree impurity reduction %';
     modelColor = '#5b7f5f';
     topColor = '#426146';
     items = rawRf.map((item, idx) => ({
+      key: item.feature,
+      name: FEATURE_METADATA[item.feature]?.name || item.feature.replace(/_/g, ' '),
+      category: FEATURE_METADATA[item.feature]?.category || 'Attribute',
+      desc: FEATURE_METADATA[item.feature]?.desc || '',
+      rank: idx + 1,
+      percentage: Number(item.percentage.toFixed(2)),
+      displayVal: `${item.percentage.toFixed(2)}%`,
+    }));
+  } else if (model === 'decision_tree') {
+    maxScale = 60;
+    metricLabel = 'Single tree Gini split variance reduction %';
+    modelColor = '#8a6d3b'; // Bronze/warm ochre for DT
+    topColor = '#6b5126';
+    items = rawDt.map((item, idx) => ({
       key: item.feature,
       name: FEATURE_METADATA[item.feature]?.name || item.feature.replace(/_/g, ' '),
       category: FEATURE_METADATA[item.feature]?.category || 'Attribute',
@@ -188,7 +203,19 @@ export default function FeatureImportancePlot({ importances }) {
                 : 'text-graphite hover:bg-paper hover:text-ink'
             }`}
           >
-            Random forest (Tree split importance %)
+            Random forest
+          </button>
+          <button
+            type="button"
+            onClick={() => { setModel('decision_tree'); setHovered(null); }}
+            aria-pressed={model === 'decision_tree'}
+            className={`cursor-pointer rounded-md px-3 py-1.5 text-small transition-colors ${
+              model === 'decision_tree'
+                ? 'bg-ink font-medium text-paper'
+                : 'text-graphite hover:bg-paper hover:text-ink'
+            }`}
+          >
+            Decision tree
           </button>
           <button
             type="button"
@@ -200,7 +227,7 @@ export default function FeatureImportancePlot({ importances }) {
                 : 'text-graphite hover:bg-paper hover:text-ink'
             }`}
           >
-            KNN (Permutation importance %)
+            KNN
           </button>
           <button
             type="button"
@@ -212,7 +239,7 @@ export default function FeatureImportancePlot({ importances }) {
                 : 'text-graphite hover:bg-paper hover:text-ink'
             }`}
           >
-            Ridge regression (Relative coefficient weight %)
+            Ridge regression
           </button>
         </div>
 
@@ -265,6 +292,7 @@ export default function FeatureImportancePlot({ importances }) {
             let fill = modelColor;
             if (idx === 0) fill = topColor; // Emphasize #1 driver
             else if (idx >= 6) fill = '#92a395'; // Muted for smaller tails
+            if (model === 'decision_tree' && idx >= 6) fill = '#a8987b';
             if (model === 'knn' && idx >= 6) fill = '#a497b5';
             if (model === 'linear_regression' && idx >= 6) fill = '#8291b5';
 
@@ -298,7 +326,7 @@ export default function FeatureImportancePlot({ importances }) {
                   {col.rank}
                 </text>
 
-                {/* Y-Axis Normal Attribute Name (Clean & Clear, e.g. "Location") */}
+                {/* Y-Axis Normal Attribute Name */}
                 <text
                   x={pad.left - 12}
                   y={y + barHeight / 2 + 4}
@@ -412,7 +440,7 @@ export default function FeatureImportancePlot({ importances }) {
               </div>
               <p className="mt-1 font-display text-[1.2rem] font-medium text-ink">Super Built-up Area</p>
               <p className="mt-1 text-small text-graphite">
-                Determines over half of all decision tree splits, establishing the primary physical baseline price.
+                Determines over half of all ensemble decision tree splits, establishing the primary physical baseline price.
               </p>
             </div>
             <div className="rounded-xl border border-line bg-bone p-4">
@@ -433,6 +461,41 @@ export default function FeatureImportancePlot({ importances }) {
               <p className="mt-1 font-display text-[1.2rem] font-medium text-ink">Locality Tier</p>
               <p className="mt-1 text-small text-graphite">
                 Neighborhood infrastructure tier (Budget, Mid, or Premium) acts as the third strongest categorical branching split.
+              </p>
+            </div>
+          </>
+        )}
+
+        {model === 'decision_tree' && (
+          <>
+            <div className="rounded-xl border border-line bg-bone p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-micro font-medium text-muted">#1 Root Split</span>
+                <span className="rounded bg-[#f0e6d2] px-2 py-0.5 text-micro font-semibold text-[#6b5126]">52.91%</span>
+              </div>
+              <p className="mt-1 font-display text-[1.2rem] font-medium text-ink">Super Built-up Area</p>
+              <p className="mt-1 text-small text-graphite">
+                Root and early node splits partition properties by square footage scale before any geographic branching.
+              </p>
+            </div>
+            <div className="rounded-xl border border-line bg-bone p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-micro font-medium text-muted">#2 Geographic Branching</span>
+                <span className="rounded bg-[#f0e6d2] px-2 py-0.5 text-micro font-semibold text-[#6b5126]">36.26%</span>
+              </div>
+              <p className="mt-1 font-display text-[1.2rem] font-medium text-ink">Location</p>
+              <p className="mt-1 text-small text-graphite">
+                Second-tier decision nodes isolate city markets (Mumbai vs Bangalore vs Nagpur) to adjust baseline pricing.
+              </p>
+            </div>
+            <div className="rounded-xl border border-line bg-bone p-4">
+              <div className="flex items-center justify-between">
+                <span className="text-micro font-medium text-muted">#3 Quality Tier</span>
+                <span className="rounded bg-[#f0e6d2] px-2 py-0.5 text-micro font-semibold text-[#6b5126]">9.13%</span>
+              </div>
+              <p className="mt-1 font-display text-[1.2rem] font-medium text-ink">Locality Tier</p>
+              <p className="mt-1 text-small text-graphite">
+                Tertiary branches separate Budget, Mid, and Premium micro-markets within each metropolitan territory.
               </p>
             </div>
           </>

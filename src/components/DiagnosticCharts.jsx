@@ -6,15 +6,17 @@ import FeatureImportancePlot from './FeatureImportancePlot';
 
 const MODEL_OPTS = [
   { id: 'random_forest', label: 'Random forest' },
+  { id: 'decision_tree', label: 'Decision tree' },
   { id: 'linear_regression', label: 'Ridge regression' },
   { id: 'knn', label: 'Nearest neighbours' },
 ];
 
 const CITY_MODEL_OPTS = [
   { id: 'random_forest', label: 'Random forest' },
+  { id: 'decision_tree', label: 'Decision tree' },
   { id: 'linear_regression', label: 'Ridge regression' },
   { id: 'knn', label: 'Nearest neighbours' },
-  { id: 'compare_all', label: 'Compare all three' },
+  { id: 'compare_all', label: 'Compare all four' },
 ];
 
 export default function DiagnosticCharts({ metrics }) {
@@ -30,11 +32,14 @@ export default function DiagnosticCharts({ metrics }) {
   const residuals = metrics.models?.[residModel]?.residuals;
 
   const rfCityErrors = metrics.models?.random_forest?.city_errors || {};
+  const dtCityErrors = metrics.models?.decision_tree?.city_errors || {};
   const lrCityErrors = metrics.models?.linear_regression?.city_errors || {};
   const knnCityErrors = metrics.models?.knn?.city_errors || {};
 
   const activeCityErrors =
-    cityModel === 'linear_regression'
+    cityModel === 'decision_tree'
+      ? dtCityErrors
+      : cityModel === 'linear_regression'
       ? lrCityErrors
       : cityModel === 'knn'
       ? knnCityErrors
@@ -161,14 +166,15 @@ export default function DiagnosticCharts({ metrics }) {
           </div>
         )}
 
-        {/* View Mode B: Compare All Three Side-by-Side */}
+        {/* View Mode B: Compare All Four Side-by-Side */}
         {cityModel === 'compare_all' && (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             {citiesList.map((city) => {
               const rf = rfCityErrors[city] || {};
+              const dt = dtCityErrors[city] || {};
               const lr = lrCityErrors[city] || {};
               const knn = knnCityErrors[city] || {};
-              const count = rf.count || 0;
+              const count = rf.count || dt.count || 0;
 
               return (
                 <div key={city} className="rounded-xl border border-line-soft bg-paper/70 p-4">
@@ -177,7 +183,7 @@ export default function DiagnosticCharts({ metrics }) {
                     <span className="text-micro text-muted">{count} tests</span>
                   </div>
 
-                  <div className="mt-3 space-y-2.5 text-small">
+                  <div className="mt-3 space-y-2 text-small">
                     {/* Random Forest */}
                     <div className="rounded-lg bg-sage/15 p-2">
                       <div className="flex items-center justify-between">
@@ -185,6 +191,15 @@ export default function DiagnosticCharts({ metrics }) {
                         <span className="text-[0.7rem] font-bold text-sage-deep">R² {(rf.r2 * 100).toFixed(1)}%</span>
                       </div>
                       <span className="text-[0.68rem] text-graphite tabular">MAE ± ₹{(rf.mae / 1e5).toFixed(1)}L</span>
+                    </div>
+
+                    {/* Decision Tree */}
+                    <div className="rounded-lg bg-[#fbf5ea] p-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[0.72rem] font-medium text-[#7a5a22]">Decision tree</span>
+                        <span className="text-[0.7rem] font-bold text-[#7a5a22]">R² {dt.r2 ? (dt.r2 * 100).toFixed(1) : '—'}%</span>
+                      </div>
+                      <span className="text-[0.68rem] text-graphite tabular">MAE ± ₹{dt.mae ? (dt.mae / 1e5).toFixed(1) : '—'}L</span>
                     </div>
 
                     {/* Ridge Regression */}

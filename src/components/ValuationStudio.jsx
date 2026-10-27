@@ -10,6 +10,7 @@ const PRESETS = [
 
 const MODEL_META = {
   random_forest: { name: 'Random forest', note: 'best fit', color: '#5b7f5f' },
+  decision_tree: { name: 'Decision tree', note: 'fast tree', color: '#8a6d3b' },
   linear_regression: { name: 'Ridge regression', color: '#56658f' },
   knn: { name: 'Nearest neighbours', color: '#87759f' },
 };
@@ -90,7 +91,7 @@ export default function ValuationStudio({ metadata, onPredict, predictions, pred
             The estimate recalculates as you change a detail. Nothing is saved.
           </p>
         </div>
-        <p className="text-label text-muted">18 features, 3 models</p>
+        <p className="text-label text-muted">18 features, 4 models</p>
       </div>
 
       <div className="mb-9 flex flex-wrap items-center gap-2">
@@ -288,7 +289,7 @@ export default function ValuationStudio({ metadata, onPredict, predictions, pred
                 })}
               </div>
               <p className="mt-5 text-micro text-muted">
-                The ensemble weights all three models equally. Random forest has the
+                The ensemble weights all four models equally. Random forest has the
                 strongest held-out fit.
               </p>
             </div>
